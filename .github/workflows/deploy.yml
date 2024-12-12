@@ -6,8 +6,8 @@ on:
       - main
 
 concurrency:
-    group: cd-production
-    cancel-in-progress: true
+  group: cd-production
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -31,5 +31,5 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            docker-compose down
-            docker-compose up -d
+            docker compose down
+            docker compose up -d
