@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { VStack, Container } from "@chakra-ui/react";
+import { useState, useEffect, useRef } from "react";
+import { VStack, Container, Box } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import MessageBubble from "./message-bubble";
 import ChatInput from "./chat-input";
@@ -11,6 +11,12 @@ const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const chatId = window.location.pathname.slice(1);
   const navigate = useNavigate();
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
     const initializeChat = async () => {
@@ -34,6 +40,10 @@ const Chat: React.FC = () => {
 
     initializeChat();
   }, [chatId, navigate]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const addMessage = async (text: string) => {
     const userMessage: Message = {
@@ -59,26 +69,48 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <Container
-      height="100%"
+    <Box
+      height="100vh"
       width="100%"
       display="flex"
       flexDirection="column"
-      alignItems="center"
-      maxH="100%"
+      position="fixed"
+      top={0}
+      left={0}
     >
-      <VStack flex={1} overflowY="auto" width={["100%", "80%"]}>
-        {messages.map((msg, index) => (
-          <MessageBubble
-            key={index}
-            message={msg.content}
-            isUser={msg.sender === "user"}
-          />
-        ))}
-      </VStack>
-      <ChatInput onSendMessage={addMessage} />
+      <Box
+        flex={1}
+        width="100%"
+        overflowY="auto"
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        mt={[16, 20]}
+        mb={[36, 24]}
+      >
+        <Container maxW="container.lg" height="100%">
+          <VStack
+            spacing={4}
+            width={["100%", "100%", "80%"]}
+            margin="0 auto"
+            mb={20}
+          >
+            {messages.map((msg, index) => (
+              <MessageBubble
+                key={index}
+                message={msg.content}
+                isUser={msg.sender === "user"}
+              />
+            ))}
+            <div ref={messagesEndRef} />
+          </VStack>
+        </Container>
+      </Box>
+      <Container maxW="container.lg">
+        <ChatInput onSendMessage={addMessage} />
+      </Container>
       <Toaster />
-    </Container>
+    </Box>
   );
 };
 
