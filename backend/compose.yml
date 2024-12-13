@@ -3,6 +3,7 @@ name: agbero
 services:
   setup:
     image: python:3.12-slim
+    working_dir: /app
     volumes:
       - .:/app
     command: >
@@ -15,6 +16,7 @@ services:
 
   api:
     image: python:3.12-slim
+    working_dir: /app
     ports:
       - "${API_PORT}:${API_PORT}"
     env_file:
