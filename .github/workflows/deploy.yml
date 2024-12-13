@@ -43,19 +43,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Navigate to frontend and create env file
-        run: |
-          cd frontend
-          echo "${{ secrets.ENV_FILE }}" | base64 -d > .env
-
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Navigate to frontend and create env file
+        run: |
+          cd frontend
+          echo "${{ secrets.ENV_FILE }}" | base64 -d > .env
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build the application
         run: npm run build
