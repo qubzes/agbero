@@ -26,7 +26,7 @@ router = APIRouter(prefix="/chats", tags=["Chats"])
 settings = Settings()
 
 groq_api_key = settings.GROQ_API_KEY
-model = "llama-3.3-70b-versatile"
+model = settings.GROQ_MODEL
 groq_chat = ChatGroq(groq_api_key=groq_api_key, model_name=model)
 
 

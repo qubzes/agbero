@@ -10,7 +10,7 @@ load_dotenv()
 class Settings(BaseSettings):
     # AI Settings
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "get-your-groq-key-here")
-    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "gpt-4o-mini")
+    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
     SYSTEM_PROMPT: str = os.getenv(
         "SYSTEM_PROMPT",
         (
