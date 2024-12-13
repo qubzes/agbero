@@ -1,78 +1,18 @@
-interface ApiError {
-  message: string;
-  status?: number;
-}
+import axios from "axios";
 
-interface ApiResponse<T> {
-  data: T;
-  status: number;
-}
+export const apiClient = axios.create({
+  baseURL: (import.meta.env.VITE_API_URL || "") + "/api",
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-const baseUrl = import.meta.env.VITE_API_URL || "";
-
-const handleResponse = async <T>(
-  response: Response
-): Promise<ApiResponse<T>> => {
-  if (!response.ok) {
-    const error: ApiError = {
-      message: "An error occurred",
-      status: response.status,
-    };
-
-    try {
-      const errorData = await response.json();
-      error.message = errorData.message || error.message;
-    } catch {
-      error.message = response.statusText;
-    }
-
-    throw error;
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    return Promise.reject(
+      new Error(error.response?.data?.detail || "An error occurred")
+    );
   }
-
-  const data = await response.json();
-  return { data, status: response.status };
-};
-
-export const apiClient = {
-  get: async <T>(endpoint: string): Promise<ApiResponse<T>> => {
-    const response = await fetch(`${baseUrl}${endpoint}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return handleResponse<T>(response);
-  },
-
-  post: async <T>(endpoint: string, body: unknown): Promise<ApiResponse<T>> => {
-    const response = await fetch(`${baseUrl}${endpoint}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    return handleResponse<T>(response);
-  },
-
-  put: async <T>(endpoint: string, body: unknown): Promise<ApiResponse<T>> => {
-    const response = await fetch(`${baseUrl}${endpoint}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    return handleResponse<T>(response);
-  },
-
-  delete: async <T>(endpoint: string): Promise<ApiResponse<T>> => {
-    const response = await fetch(`${baseUrl}${endpoint}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    return handleResponse<T>(response);
-  },
-};
+);
