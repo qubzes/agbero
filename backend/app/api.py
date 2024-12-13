@@ -106,7 +106,7 @@ async def get_chat(
             db, chat_id=chat.id, sort_by="created_at"
         )
         return ChatResponse(
-            id=chat.id,
+            chat_id=chat.id,
             created_at=chat.created_at.isoformat(),
             messages=[
                 MessageResponse(
