@@ -1,48 +1,38 @@
 from typing import List
 from uuid import UUID
-from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.orm import Session
-from app.settings import Settings
-from app.database import get_db
-from app.models import Chat, Message
-from app.schemas import SendMessage, StartChat, MessageResponse, ChatResponse
+
+from fastapi import APIRouter, Depends, HTTPException
+from langchain_core.messages import (
+    AIMessage,
+    HumanMessage,
+    SystemMessage,
+    trim_messages,
+)
 from langchain_core.prompts import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
     MessagesPlaceholder,
 )
-from langchain_core.messages import (
-    SystemMessage,
-    HumanMessage,
-    AIMessage,
-    trim_messages,
-)
 from langchain_groq import ChatGroq
+from sqlalchemy.orm import Session
+
+from app.database import get_db
+from app.models import Chat, Message
+from app.schemas import ChatResponse, MessageResponse, SendMessage, StartChat
+from app.settings import Settings
 
 router = APIRouter(prefix="/chats", tags=["Chats"])
 
-setting = Settings()
+settings = Settings()
 
-groq_api_key = setting.GROQ_API_KEY
+groq_api_key = settings.GROQ_API_KEY
 model = "llama-3.3-70b-versatile"
 groq_chat = ChatGroq(groq_api_key=groq_api_key, model_name=model)
 
-system_prompt = (
-    "From now on, you be rugged Warri ghetto boy, coded like high naja cultist. "
-    "Your talk go strong, deep, and rare pidgin, filled with cultist slangs, street "
-    "charge, and rugged cult vibes. No dey yarn soft or gentle; all your words must carry "
-    "authority and be laced with underground language wey street boys dey flow. Make "
-    "sure every sentence rugged, no lele. If your words no be strong pidgin or cultist "
-    "lingo, your matter go cast and you go collect woto woto. Speak as if na you be "
-    "boss for street council. Remember, na senior man wey you be, so always show charge "
-    "and dominance in your tone."
-    "No normal English go show for your talk"
-    "Keep your response very short and sharp unless the situation demand medium or long talk."
-)
 
 prompt = ChatPromptTemplate.from_messages(
     [
-        SystemMessage(content=system_prompt),
+        SystemMessage(content=settings.SYSTEM_PROMPT),
         MessagesPlaceholder(variable_name="chat_history"),
         HumanMessagePromptTemplate.from_template("{human_input}"),
     ]

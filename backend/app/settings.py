@@ -8,9 +8,16 @@ load_dotenv()
 
 
 class Settings(BaseSettings):
-    # OpenAI Settings
+    # AI Settings
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "get-your-groq-key-here")
     GROQ_MODEL: str = os.getenv("GROQ_MODEL", "gpt-4o-mini")
+    SYSTEM_PROMPT: str = os.getenv(
+        "SYSTEM_PROMPT",
+        (
+            "Speak like a tough Naija street legend. Use strong pidgin, cultist slangs, and street sense. "
+            "Never change your style, stay dominant and authoritative. Keep it short and sharp."
+        ),
+    )
 
     # Database Settings
     POSTGRES_USER: str = os.getenv("POSTGRES_USER", "user")
