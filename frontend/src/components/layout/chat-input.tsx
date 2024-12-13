@@ -68,6 +68,8 @@ const ChatInput = ({
             border="none"
             borderRadius="2xl"
             p={6}
+            pr="3rem"
+            pl="1rem"
           />
           <Button
             onClick={handleSend}
@@ -83,11 +85,7 @@ const ChatInput = ({
             <FaFistRaised />
           </Button>
         </Box>
-        <Text
-          color="gray.600"
-          fontSize={["xs", "sm"]}
-          textAlign="center"
-        >
+        <Text color="gray.600" fontSize={["xs", "sm"]} textAlign="center">
           Dis bot na for rugged cruise, no use am for gbege or yawa.
         </Text>
       </Flex>
