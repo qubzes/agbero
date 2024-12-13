@@ -51,14 +51,15 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Navigate to frontend and create env file
-        run: |
-          cd frontend
-          echo "${{ secrets.ENV_FILE }}" | base64 -d > .env
+        working-directory: ./frontend
+        run: echo "${{ secrets.ENV_FILE }}" | base64 -d > .env
 
       - name: Install dependencies
+        working-directory: ./frontend
         run: npm ci
 
       - name: Build the application
+        working-directory: ./frontend
         run: npm run build
 
       - name: Deploy on Server
@@ -67,5 +68,5 @@ jobs:
           host: ${{ secrets.PROD_HOST }}
           username: ${{ secrets.PROD_USERNAME }}
           key: ${{ secrets.PROD_KEY }}
-          source: dist/*
+          source: frontend/dist/*
           target: /var/www/agbero
