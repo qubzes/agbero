@@ -15,7 +15,8 @@ const Chat: React.FC = () => {
   useEffect(() => {
     const initializeChat = async () => {
       try {
-        await chatService.startNewChat();
+        const message = await chatService.startNewChat();
+        console.log("Chat initialized with message:", message);
       } catch (error) {
         console.error("Failed to start new chat:", error);
       }

@@ -49,7 +49,7 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 
-@router.get("/")
+@router.get("")
 async def get_all_chats(db: Session = Depends(get_db)) -> List[StartChat]:
     """Get all chats."""
     try:
@@ -64,7 +64,7 @@ async def get_all_chats(db: Session = Depends(get_db)) -> List[StartChat]:
         )
 
 
-@router.post("/")
+@router.post("")
 async def start_new_chat(db: Session = Depends(get_db)) -> StartChat:
     """Create a new chat."""
     try:
