@@ -90,7 +90,7 @@ const Chat: React.FC = () => {
       >
         <Container maxW="container.lg" height="100%">
           <VStack
-            spacing={4}
+            gap={4}
             width={["100%", "100%", "80%"]}
             margin="0 auto"
             mb={20}
