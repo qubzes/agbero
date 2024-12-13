@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 concurrency:
   group: cd-production
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  deploy-backend:
     runs-on: ubuntu-latest
     environment:
       name: "production"
@@ -19,17 +20,38 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy to Server
+      - name: Deploy Backend to Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd agbero
-
+            cd agbero/backend
             git fetch origin main
             git reset --hard origin/main
-
             docker compose down
             docker compose up -d
+
+  # deploy-frontend:
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: "production"
+  #     url: ${{ vars.PROD_URL }}
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: Deploy Frontend to Server
+  #       uses: appleboy/ssh-action@master
+  #       with:
+  #         host: ${{ secrets.SSH_HOST }}
+  #         username: ${{ secrets.SSH_USER }}
+  #         key: ${{ secrets.SSH_KEY }}
+  #         script: |
+  #           cd agbero/frontend
+  #           git fetch origin main
+  #           git reset --hard origin/main
+  #           yarn install
+  #           yarn build
+  #           pm2 restart frontend
