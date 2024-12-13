@@ -55,7 +55,7 @@ jobs:
           echo "${{ secrets.ENV_FILE }}" | base64 -d > .env
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build the application
         run: npm run build
