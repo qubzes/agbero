@@ -1,15 +1,15 @@
 import api from "./client";
 import { StartChat, Chat, Message } from "@/types/chat";
 
-export const chatService = {
+export const chat = {
   getAllChats: async (): Promise<StartChat[]> => {
     const response = await api.get<StartChat[]>("/chats");
     return response.data;
   },
 
-  startNewChat: async (): Promise<string | null> => {
+  startNewChat: async (): Promise<StartChat> => {
     const response = await api.post<StartChat>("/chats", {});
-    return response.data.message;
+    return response.data;
   },
 
   getChat: async (chatId: string): Promise<Chat> => {
@@ -18,7 +18,7 @@ export const chatService = {
   },
 
   sendMessage: async (chatId: string, message: string): Promise<Message> => {
-    const response = await api.post<Message>(`/chats/${chatId}/messages`, {
+    const response = await api.post<Message>(`/chats/${chatId}/message`, {
       message,
     });
     return response.data;

@@ -1,45 +1,61 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { VStack, Container } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import MessageBubble from "./message-bubble";
 import ChatInput from "./chat-input";
-import { chatService } from "@/api/chat";
-import { useEffect } from "react";
-interface Message {
-  text: string;
-  isUser: boolean;
-}
+import { chat } from "@/api/chat";
+import { Message } from "@/types/chat";
+import { Toaster, toaster } from "@/components/ui/toaster";
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const chatId = window.location.pathname.slice(1);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const initializeChat = async () => {
       try {
-        const message = await chatService.startNewChat();
-        console.log("Chat initialized with message:", message);
-      } catch (error) {
-        console.error("Failed to start new chat:", error);
+        if (!chatId) {
+          const newChat = await chat.startNewChat();
+          navigate(`/${newChat.chat_id}`);
+        } else {
+          const existingChat = await chat.getChat(chatId);
+          setMessages(existingChat.messages);
+        }
+      } catch {
+        toaster.create({
+          description: "Talk no gree load, we don knack fresh mata...",
+          type: "error",
+        });
+        const newChat = await chat.startNewChat();
+        navigate(`/${newChat.chat_id}`);
       }
     };
 
     initializeChat();
-  }, []);
-  const getDummyResponse = () => {
-    const responses = [
-      "I understand what you're saying.",
-      "That's interesting! Tell me more.",
-      "I'm here to help you.",
-      "Let me think about that...",
-      "Could you elaborate on that?",
-    ];
-    return responses[Math.floor(Math.random() * responses.length)];
-  };
+  }, [chatId, navigate]);
 
-  const addMessage = (text: string) => {
-    const userMessage = { text, isUser: true };
-    const assistantMessage = { text: getDummyResponse(), isUser: false };
+  const addMessage = async (text: string) => {
+    const userMessage: Message = {
+      message_id: Date.now().toString(),
+      sender: "user",
+      content: text,
+      created_at: new Date().toISOString(),
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
 
-    setMessages([...messages, userMessage, assistantMessage]);
+    try {
+      const response = await chat.sendMessage(chatId, text);
+      const assistantMessage: Message = {
+        message_id: response.message_id,
+        sender: response.sender,
+        content: response.content,
+        created_at: response.created_at,
+      };
+      setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    }
   };
 
   return (
@@ -53,10 +69,15 @@ const Chat: React.FC = () => {
     >
       <VStack flex={1} overflowY="auto" width={["100%", "80%"]}>
         {messages.map((msg, index) => (
-          <MessageBubble key={index} message={msg.text} isUser={msg.isUser} />
+          <MessageBubble
+            key={index}
+            message={msg.content}
+            isUser={msg.sender === "user"}
+          />
         ))}
       </VStack>
-      <ChatInput onSendMessage={(text) => addMessage(text)} />
+      <ChatInput onSendMessage={addMessage} />
+      <Toaster />
     </Container>
   );
 };
