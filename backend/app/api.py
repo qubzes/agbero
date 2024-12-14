@@ -163,7 +163,7 @@ async def send_message_to_chat(
         # Trim the chat history
         messages_to_send = trim_messages(
             chat_history,
-            max_tokens=2048,
+            max_tokens=256,
             token_counter=lambda messages: sum(
                 len(msg.content.split()) for msg in messages
             ),
